@@ -48,7 +48,7 @@ Vcc=5v
 
 回路図は以下の通り
 
-![board](./picture/board.PNG)
+![board](./picture/board.png)
 
 ## ファームウェアについて
 
