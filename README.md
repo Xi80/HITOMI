@@ -1,5 +1,7 @@
 # HiT0M1
 
+![LOGO](./images/LOGO.png)
+
 ## 仕様
 
 メインMCU:**ATMega328p@16MHz**
