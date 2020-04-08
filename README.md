@@ -2,6 +2,8 @@
 
 ![LOGO](./images/LOGO.png)
 
+***THIS PROJECT IS W.I.P!!!!***
+
 ## 仕様
 
 メインMCU:**ATMega328p@16MHz**
