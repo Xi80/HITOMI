@@ -85,6 +85,46 @@ int retFnum(tones tone){
     }
 }
 
+int retFreq(tones tone){
+    switch(tone){
+        case C:
+            return 262;
+            break;
+        case CS:
+            return 277;
+            break;
+        case D:
+            return 294;
+            break;
+        case DS:
+            return 311;
+            break;
+        case E:
+            return 330;
+            break;
+        case F:
+            return 349;
+            break;
+        case FS:
+            return 370;
+            break;
+        case G:
+            return 392;
+            break;
+        case GS:
+            return 415;
+            break;
+        case A:
+            return 440;
+            break;
+        case AS:
+            return 466;
+            break;
+        case B:
+            return 323;
+            break;
+    }    
+}
 void subroutineInit(void){
   pinMode(SRCLK, OUTPUT);
   pinMode(RCLK,  OUTPUT);
@@ -103,6 +143,7 @@ void subroutineInit(void){
   pinMode(IC_PIN, OUTPUT);
   pinMode(A0_PIN, OUTPUT);
   SPI.begin();
+  Serial.begin(31250);
   SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
 }
 
@@ -239,16 +280,111 @@ void reset(void){
     setRegister(FM,0x28,_BV(4));
 }
 
-void setFnum(int ch, int oct,tones tone) {
-  int f_number = retFnum(tone);
-  setRegister(FM,0x10 + ch, f_number & 0xff);
-  setRegister(FM,0x20 + ch, (1 << 4) | (oct << 1) | (f_number >> 8));
+//set tone
+void set(chips chip,int ch, int oct,tones tone) {
+    int octTable[] = {-4,-3,-2,-1,1,2,3,4,5,6};
+    if(chip == FM){
+        int f_number = retFnum(tone);
+        setRegister(FM,0x10 + ch, f_number & 0xff);
+        setRegister(FM,0x20 + ch, (1 << 4) | (oct << 1) | (f_number >> 8));
+    } else {
+        word freq = retFreq(tone);
+        if(octTable[oct] > 0){
+            freq *= octTable[oct];
+        } else {
+            freq /= abs(octTable[oct]);
+        }
+        word cal_freqency = 0;
+        if (freq != 0) {
+            cal_freqency = 125000 / freq;
+        }
+        cal_freqency &= 0b0000111111111111;
+        setRegister(chip,0x00 + (ch * 2), cal_freqency & 0xff);
+        setRegister(chip,0x01 + (ch * 2), (cal_freqency >> 8) & 0xff);
+    }
+
 }
 
-void SetInstVol(int ch, int inst, int vol) {
-  setRegister(FM,0x30 + ch, (inst << 4) | vol);
+void setInstVol(chips chip,int ch,insts inst, int vol) {
+    if(chip == FM){
+        setRegister(FM,0x30 + ch, (int(inst) << 4) | vol);
+    } else {
+        int addr;
+        switch(chip){
+            case PSG1:
+                addr = 0x08;
+                break;
+            case PSG2:
+                addr = 0x09;
+                break;
+            case PSG3:
+                addr = 0x0A;
+        }
+        setRegister(chip,addr,vol);
+    }
+  
 }
 
+void notesOn(chips chip,tones tone,int oct){
+
+}
+
+void notesOff(){
+
+}
+
+void controlChange(){
+
+}
+
+void programChange(){
+
+}
+
+void allNotesOff(void){
+
+}
+
+void midiInput(void){
+    while(!Serial.available());
+
+    byte data1 = Serial.read();
+    byte data2 = 0x00;
+    byte data3 = 0x00;
+
+    if(data1 >= 0x80 && data1 <= 0x89){
+        //NoteOff
+        while(!(Serial.available() >= 2));
+        data2 = Serial.read();
+        data3 = Serial.read();
+    } else if(data1 >= 0x90 && data1 <= 0x99){
+        //NoteOn
+        while(!(Serial.available() >= 2));
+        data2 = Serial.read();
+        data3 = Serial.read();
+    } else if(data1 >= 0xB0 && data1 <= 0xB4){
+        //ControlChange
+        while(!(Serial.available() >= 2));
+        data2 = Serial.read();
+        data3 = Serial.read();       
+    } else if(data1 == 0xC3){
+        //ProgramChange(FM Only)
+        while(!(Serial.available() >= 1));
+        data2 = Serial.read();
+    } else if(data1 >= 0xB0 && data1 <= 0xB9){
+        //AllNotesOff
+        while(!(Serial.available() >= 2));
+        data2 = Serial.read();
+        data3 = Serial.read();
+        if(data2 == 0x7B && data3 == 0x00){
+
+        }
+
+    } else {
+        return;
+    }
+
+}
 void setup() {
   // put your setup code here, to run once:
   reset();
