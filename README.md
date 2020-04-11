@@ -30,9 +30,9 @@ I/F:**MIDI(DIN5Pin),3.5mmステレオジャック(出力はモノラル)**
 
 ![Media](./images/sch.png)
 
-![Board_OMOTE](./images/brd_top.PNG)
+![Board_OMOTE](./images/brd_top.png)
 
-![Board_URA](./images/brd_bottom.PNG)
+![Board_URA](./images/brd_bottom.png)
 
 ![brd](./images/brd_all.png)
 
