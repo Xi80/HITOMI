@@ -343,6 +343,8 @@ void setPSGVol(chipSelect chip,int ch,int vol){
     case chip_PSG3:
       setRegister(chip_PSG3,0x08 + ch,vol);
       break;
+    default:
+      break;
   }
 }
 
@@ -396,6 +398,8 @@ void setFMRythm(rythmSelect rythm,bool key){
         //OFF
         nowRythm &= ~(_BV(1));
       }
+      break;
+    default:
       break;
   }
   setRegister(chip_FM,0x0E,nowRythm);
@@ -455,7 +459,8 @@ instrumentSelect retInst(byte data){
     case 0x1B:
       return ELEGUITAR;
       break;
-
+    default:
+      break;
   }
 }
 
@@ -499,6 +504,8 @@ int retFnum(toneSelect tone){
         break;
       case B:
         return 323;
+        break;
+      default:
         break;
   }
 }
@@ -556,7 +563,8 @@ int retInstNum(instrumentSelect inst){
     case ELEGUITAR:
         return 0x0F;
         break;
-
+    default:
+        break;
   }
 }
 
@@ -654,6 +662,8 @@ toneSelect retTone(byte data){
     case 11:
         return B;
         break;
+    default:
+        break;
   }
 }
 
@@ -680,6 +690,8 @@ rythmSelect retRythm(byte data){
       break;
     case 0x2A:
       return HH;
+      break;
+    default:
       break;
   }
 }
@@ -824,6 +836,7 @@ void noteOn(int ch,int note){
       //FM_Rythm
       rythmSelect rythm = retRythm(note);
       setFMRythm(rythm,true);
+      break;
     default:
       break;
   }
@@ -930,6 +943,7 @@ void noteOff(int ch,int note){
       //FM_Rythm
       rythmSelect rythm = retRythm(note);
       setFMRythm(rythm,false);
+      break;
     default:
       break;
   }
