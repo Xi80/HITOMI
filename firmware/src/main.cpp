@@ -671,6 +671,9 @@ int retOct(byte data){
   return ((int)data / 12) - 1;
 }
 
+//@brief  :MIDIからパーカッション系のデータを返す
+//@param  :data(byte)
+//@return :rythmSelect
 rythmSelect retRythm(byte data){
   switch(data){
     case 0x24:
@@ -693,6 +696,9 @@ rythmSelect retRythm(byte data){
   }
 }
 
+//@brief  :デバッグ用、各種データをLEDで示す
+//@param  :data(byte)
+//@return :なし
 void debugData(byte data){
   switch(data){
     case 0x08:
