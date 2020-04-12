@@ -139,8 +139,8 @@ void setChipSelect(chipSelect chip);
 void setWriteEnable(chipSelect chip);
 void sendData(byte data);
 void setRegister(chipSelect chip,byte addr,byte data);
-void setTone(chipSelect chip,int ch,word freq);
-void setTone(chipSelect chip,int ch,int fNumber,toneSelect tone,int oct);
+void setTonePSG(chipSelect chip,int ch,word freq);
+void setToneFM(chipSelect chip,int ch,int fNumber,toneSelect tone,int oct);
 void setFMInstVol(chipSelect chip,int ch,instrumentSelect inst,int vol);
 void setPSGVol(channelSelect channel,int ch,int vol);
 instrumentSelect retInst(byte data);
@@ -312,7 +312,7 @@ void setRegister(chipSelect chip,byte addr,byte data){
 //@brief  :指定チャンネルの音をセットする(PSG)
 //@param  :channel(channelSelect),ch(int),freq(word)
 //@return :なし
-void setTone(chipSelect chip,int ch,word freq){
+void setTonePSG(chipSelect chip,int ch,word freq){
   word cal_freqency = 0;
   if (freq != 0) {
     cal_freqency = 125000 / freq;
@@ -325,7 +325,7 @@ void setTone(chipSelect chip,int ch,word freq){
 //@brief  :指定チャンネルの音をセットする(FM)
 //@param  :channel(channelSelect),ch(int),fNumber(int),tone(toneSelect),oct(int)
 //@return :なし
-void setTone(chipSelect chip,int ch,int fNumber,toneSelect tone,int oct){
+void setToneFM(chipSelect chip,int ch,int fNumber,toneSelect tone,int oct){
   // F-Numberの下位8ビット
   setRegister(chip,0x10 + ch, fNumber & 0xff);
   // key=1, oct, F-Numberの上位1ビット
@@ -624,22 +624,116 @@ int retOct(byte data){
 
 
 //-----------------------------------
-void noteOn(int ch,int note){
 
+//@brief  :ノートオン
+//@param  :ch(int),note(int)
+//@return :なし
+void noteOn(int ch,int note){
+  int oct = retOct(note);
+  toneSelect tone = retTone(note);
+
+  switch(ch){
+    case 0:
+      //PSG1
+      if(!(status_PSG1.used[0])){
+        //PSG1.A is available
+        status_PSG1.used[0] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG1,0,freq);
+      } else if(!(status_PSG1.used[1])){
+        //PSG1.B is available
+        status_PSG1.used[1] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG1,1,freq);
+      } else if(!(status_PSG1.used[2])){
+        //PSG1.C is available
+        status_PSG1.used[2] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG1,2,freq);      
+      } else {
+        //Any Tone generator is unavailable
+        break;
+      }
+    case 1:
+      //PSG2
+      if(!(status_PSG2.used[0])){
+        //PSG2.A is available
+        status_PSG2.used[0] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG2,0,freq);
+      } else if(!(status_PSG2.used[1])){
+        //PSG2.B is available
+        status_PSG2.used[1] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG2,1,freq);
+      } else if(!(status_PSG2.used[2])){
+        //PSG2.C is available
+        status_PSG3.used[2] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG2,2,freq);      
+      } else {
+        //Any Tone generator is unavailable
+        break;
+      }
+    case 2:
+      //PSG3
+      if(!(status_PSG3.used[0])){
+        //PSG3.A is available
+        status_PSG3.used[0] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG3,0,freq);
+      } else if(!(status_PSG3.used[1])){
+        //PSG3.B is available
+        status_PSG3.used[1] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG3,1,freq);
+      } else if(!(status_PSG3.used[2])){
+        //PSG3.C is available
+        status_PSG3.used[2] = true;
+        int freq = retFreq(tone,oct);
+        setTonePSG(chip_PSG3,2,freq);      
+      } else {
+        //Any Tone generator is unavailable
+        break;
+      }
+    case 3:
+      //FM1(ch0-2)
+
+    case 4:
+      //FM2(ch3-5)
+
+    case 9:
+      //FM_Rythm
+
+    default:
+      break;
+  }
 }
 
+//@brief  :ノートオフ
+//@param  :ch(int),note(int)
+//@return :なし
 void noteOff(int ch,int note){
 
 }
 
+//@brief  :プログラムチェンジ
+//@param  :ch(int),pNumber(int)
+//@return :なし
 void programChange(int ch,int pNumber){
 
 }
 
+//@brief  :コントロールチェンジ
+//@param  :ch(int),cNumber(int),data(int)
+//@return :なし
 void controlChange(int ch,int cNumber,int data){
 
 }
 
+//@brief  :MIDIのパース
+//@param  :なし
+//@return :なし
 void parseMIDI(){
   byte data1 = 0xFF;
   byte top;
@@ -682,11 +776,18 @@ void parseMIDI(){
   }
 }
 
+
+//@brief  :セットアップ
+//@param  :なし
+//@return :なし
 void setup() {
   init();
   resetAll();
 }
 
+//@brief  :メインループ
+//@param  :なし
+//@return :なし
 void loop() {
   parseMIDI();
 }
