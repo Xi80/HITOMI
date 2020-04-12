@@ -99,14 +99,14 @@ enum toneSelect{
 struct _PSG{
   bool  used[3]             = {false,false,false};
   int   nowFreq[3]          = {0,0,0};
-  int   nowVol[3]           = {0,0,0};
+  int   nowVol              = 0;
 };
 
 //FMの状態把握用構造体
 struct _FM{
   bool used[3]              = {false,false,false};
   int  nowFnum[3]           = {0,0,0};
-  int  nowVol[3]            = {0,0,0};
+  int  nowVol               = 0;
   instrumentSelect nowInst  = PIANO;
 };
 
@@ -939,14 +939,97 @@ void noteOff(int ch,int note){
 //@param  :ch(int),pNumber(int)
 //@return :なし
 void programChange(int ch,int pNumber){
-
+  instrumentSelect inst = retInst(pNumber);
+  switch(ch){
+    case 3:
+      setFMInstVol(chip_FM,0,inst,status_FM1.nowVol);
+      setFMInstVol(chip_FM,1,inst,status_FM1.nowVol);
+      setFMInstVol(chip_FM,2,inst,status_FM1.nowVol);
+      status_FM1.nowInst = inst;
+      break;
+    case 4:
+      setFMInstVol(chip_FM,3,inst,status_FM2.nowVol);
+      setFMInstVol(chip_FM,4,inst,status_FM2.nowVol);
+      setFMInstVol(chip_FM,5,inst,status_FM2.nowVol);
+      status_FM1.nowInst = inst;
+      break;
+  }
 }
 
 //@brief  :コントロールチェンジ
 //@param  :ch(int),cNumber(int),data(int)
 //@return :なし
 void controlChange(int ch,int cNumber,int data){
-
+  switch(cNumber){
+    case 7:
+      switch(ch){
+        case 0:
+          setPSGVol(chip_PSG1,0,data);
+          setPSGVol(chip_PSG1,1,data);
+          setPSGVol(chip_PSG1,2,data);
+          status_PSG1.nowVol = data; 
+          break;
+        case 1:
+          setPSGVol(chip_PSG2,0,data);
+          setPSGVol(chip_PSG2,1,data);
+          setPSGVol(chip_PSG2,2,data); 
+          status_PSG2.nowVol = data;          
+          break;
+        case 2:
+          setPSGVol(chip_PSG3,0,data);
+          setPSGVol(chip_PSG3,1,data);
+          setPSGVol(chip_PSG3,2,data);
+          status_PSG3.nowVol = data;          
+          break;
+        case 3:
+          setFMInstVol(chip_FM,0,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,1,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,2,status_FM1.nowInst,data);
+          status_FM1.nowVol = data;
+          break;
+        case 4:
+          setFMInstVol(chip_FM,3,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,4,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,5,status_FM1.nowInst,data);
+          status_FM2.nowVol = data;         
+          break;
+      }
+      break;
+    case 11:
+      switch(ch){
+        case 0:
+          setPSGVol(chip_PSG1,0,data);
+          setPSGVol(chip_PSG1,1,data);
+          setPSGVol(chip_PSG1,2,data);
+          status_PSG1.nowVol = data; 
+          break;
+        case 1:
+          setPSGVol(chip_PSG2,0,data);
+          setPSGVol(chip_PSG2,1,data);
+          setPSGVol(chip_PSG2,2,data); 
+          status_PSG2.nowVol = data;          
+          break;
+        case 2:
+          setPSGVol(chip_PSG3,0,data);
+          setPSGVol(chip_PSG3,1,data);
+          setPSGVol(chip_PSG3,2,data);
+          status_PSG3.nowVol = data;          
+          break;
+        case 3:
+          setFMInstVol(chip_FM,0,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,1,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,2,status_FM1.nowInst,data);
+          status_FM1.nowVol = data;
+          break;
+        case 4:
+          setFMInstVol(chip_FM,3,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,4,status_FM1.nowInst,data);
+          setFMInstVol(chip_FM,5,status_FM1.nowInst,data);
+          status_FM2.nowVol = data;         
+          break;
+      }
+      break;
+  }
 }
 
 //@brief  :MIDIのパース
