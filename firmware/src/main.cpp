@@ -48,17 +48,6 @@ enum chipSelect{
   chip_NONE
 };
 
-//チャンネル選択用の列挙型
-enum channelSelect{
-  ch_PSG1,
-  ch_PSG2,
-  ch_PSG3,
-  ch_FM_Melody1,
-  ch_FM_Melody2,
-  ch_FM_Rythm,
-  ch_NONE
-};
-
 //リズム選択用の列挙型
 enum rythmSelect{
   R,
@@ -142,7 +131,7 @@ void setRegister(chipSelect chip,byte addr,byte data);
 void setTonePSG(chipSelect chip,int ch,word freq);
 void setToneFM(chipSelect chip,int ch,int fNumber,int oct);
 void setFMInstVol(chipSelect chip,int ch,instrumentSelect inst,int vol);
-void setPSGVol(channelSelect channel,int ch,int vol);
+void setPSGVol(chipSelect chip,int ch,int vol);
 void setFMRythm(rythmSelect rythm,bool key);
 instrumentSelect retInst(byte data);
 int retFnum(toneSelect tone);
@@ -341,17 +330,17 @@ void setFMInstVol(chipSelect chip,int ch,instrumentSelect inst,int vol){
 }
 
 //@brief  :指定チャンネルの音量を変更する(PSG)
-//@param  :channel(channelSelect),ch(int),inst(instrumentSelect),vol(int)
+//@param  :chip(chipSelect),ch(int),inst(instrumentSelect),vol(int)
 //@return :なし
-void setPSGVol(channelSelect channel,int ch,int vol){
-  switch(channel){
-    case ch_PSG1:
+void setPSGVol(chipSelect chip,int ch,int vol){
+  switch(chip){
+    case chip_PSG1:
         setRegister(chip_PSG1,0x08 + ch,vol);
       break;
-    case ch_PSG2:
+    case chip_PSG2:
       setRegister(chip_PSG2,0x08 + ch,vol);
       break;
-    case ch_PSG3:
+    case chip_PSG3:
       setRegister(chip_PSG3,0x08 + ch,vol);
       break;
   }
@@ -844,7 +833,106 @@ void noteOn(int ch,int note){
 //@param  :ch(int),note(int)
 //@return :なし
 void noteOff(int ch,int note){
-
+  int oct = retOct(note);
+  toneSelect tone = retTone(note);
+  int freq = retFreq(tone,oct);
+  int fNumber = retFnum(tone);
+  switch(ch){
+    case 0:
+      //PSG1
+      if(status_PSG1.used[0] == true && status_PSG1.nowFreq[0] == freq){
+        //PSG1.A
+        setPSGVol(chip_PSG1,0,0);
+        status_PSG1.used[0] = false;
+      } else if(status_PSG1.used[1] == true && status_PSG1.nowFreq[1] == freq){
+        //PSG1.B
+        setPSGVol(chip_PSG1,1,0);
+        status_PSG1.used[1] = false;
+      } else if(status_PSG1.used[2] == true && status_PSG1.nowFreq[2] == freq){
+        //PSG1.C
+        setPSGVol(chip_PSG1,2,0);
+        status_PSG1.used[2] = false;
+      } else {
+        //Error
+      }
+      break;
+    case 1:
+      //PSG2
+      if(status_PSG2.used[0] == true && status_PSG2.nowFreq[0] == freq){
+        //PSG2.A
+        setPSGVol(chip_PSG2,0,0);
+        status_PSG2.used[0] = false;
+      } else if(status_PSG2.used[1] == true && status_PSG2.nowFreq[1] == freq){
+        //PSG2.B
+        setPSGVol(chip_PSG2,1,0);
+        status_PSG2.used[1] = false;
+      } else if(status_PSG2.used[2] == true && status_PSG2.nowFreq[2] == freq){
+        //PSG2.C
+        setPSGVol(chip_PSG2,2,0);
+        status_PSG2.used[2] = false;
+      } else {
+        //Error
+      }
+      break;
+    case 2:
+      //PSG3
+      if(status_PSG3.used[0] == true && status_PSG3.nowFreq[0] == freq){
+        //PSG3.A
+        setPSGVol(chip_PSG3,0,0);
+        status_PSG3.used[0] = false;
+      } else if(status_PSG3.used[1] == true && status_PSG3.nowFreq[1] == freq){
+        //PSG3.B
+        setPSGVol(chip_PSG3,1,0);
+        status_PSG3.used[1] = false;
+      } else if(status_PSG3.used[2] == true && status_PSG3.nowFreq[2] == freq){
+        //PSG3.C
+        setPSGVol(chip_PSG3,2,0);
+        status_PSG3.used[2] = false;
+      } else {
+        //Error
+      }
+      break;
+    case 3:
+      if(status_FM1.used[0] == true && status_FM1.nowFnum[0] == fNumber){
+        //FM1.A
+        setFMInstVol(chip_FM,0,status_FM1.nowInst,0);
+        status_FM1.used[0] = false;
+      } else if(status_FM1.used[1] == true && status_FM1.nowFnum[1] == fNumber){
+        //FM1.B
+        setFMInstVol(chip_FM,1,status_FM1.nowInst,0);
+        status_FM1.used[1] = false;
+      } else if(status_FM1.used[2] == true && status_FM1.nowFnum[2] == fNumber){
+        //FM1.C
+        setFMInstVol(chip_FM,2,status_FM1.nowInst,0);
+        status_FM1.used[2] = false;
+      } else {
+        //Error
+      }
+      break;
+    case 4:
+      if(status_FM2.used[0] == true && status_FM2.nowFnum[0] == fNumber){
+        //FM2.A
+        setFMInstVol(chip_FM,3,status_FM2.nowInst,0);
+        status_FM2.used[0] = false;
+      } else if(status_FM2.used[1] == true && status_FM2.nowFnum[1] == fNumber){
+        //FM2.B
+        setFMInstVol(chip_FM,4,status_FM2.nowInst,0);
+        status_FM2.used[1] = false;
+      } else if(status_FM2.used[2] == true && status_FM2.nowFnum[2] == fNumber){
+        //FM2.C
+        setFMInstVol(chip_FM,5,status_FM2.nowInst,0);
+        status_FM2.used[2] = false;
+      } else {
+        //Error
+      }
+      break;
+    case 9:
+      //FM_Rythm
+      rythmSelect rythm = retRythm(note);
+      setFMRythm(rythm,false);
+    default:
+      break;
+  }
 }
 
 //@brief  :プログラムチェンジ
