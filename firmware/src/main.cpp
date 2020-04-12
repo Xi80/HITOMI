@@ -129,7 +129,7 @@ struct _PSG status_PSG2;
 struct _PSG status_PSG3;
 struct _FM  status_FM1;
 struct _FM  status_FM2;
-
+byte        nowRythm = 0x00;
 //-----------------------------------
 
 //-----------------------------------
@@ -140,9 +140,10 @@ void setWriteEnable(chipSelect chip);
 void sendData(byte data);
 void setRegister(chipSelect chip,byte addr,byte data);
 void setTonePSG(chipSelect chip,int ch,word freq);
-void setToneFM(chipSelect chip,int ch,int fNumber,toneSelect tone,int oct);
+void setToneFM(chipSelect chip,int ch,int fNumber,int oct);
 void setFMInstVol(chipSelect chip,int ch,instrumentSelect inst,int vol);
 void setPSGVol(channelSelect channel,int ch,int vol);
+void setFMRythm(rythmSelect rythm,bool key);
 instrumentSelect retInst(byte data);
 int retFnum(toneSelect tone);
 int retInstNum(instrumentSelect inst);
@@ -323,9 +324,9 @@ void setTonePSG(chipSelect chip,int ch,word freq){
 }
 
 //@brief  :指定チャンネルの音をセットする(FM)
-//@param  :channel(channelSelect),ch(int),fNumber(int),tone(toneSelect),oct(int)
+//@param  :channel(channelSelect),ch(int),fNumber(int),oct(int)
 //@return :なし
-void setToneFM(chipSelect chip,int ch,int fNumber,toneSelect tone,int oct){
+void setToneFM(chipSelect chip,int ch,int fNumber,int oct){
   // F-Numberの下位8ビット
   setRegister(chip,0x10 + ch, fNumber & 0xff);
   // key=1, oct, F-Numberの上位1ビット
@@ -354,6 +355,62 @@ void setPSGVol(channelSelect channel,int ch,int vol){
       setRegister(chip_PSG3,0x08 + ch,vol);
       break;
   }
+}
+
+//@brief  :リズム音を指定する
+//@param  :rythm(rythmSelect),key(bool)
+//@return :なし
+void setFMRythm(rythmSelect rythm,bool key){
+  nowRythm |= _BV(6);
+  switch(rythm){
+    case BD:
+      if(key){
+        //ON
+        nowRythm |= _BV(5);
+      } else {
+        //OFF
+        nowRythm &= ~(_BV(5));
+      }
+      break;
+    case SD:
+      if(key){
+        //ON
+        nowRythm |= _BV(4);
+      } else {
+        //OFF
+        nowRythm &= ~(_BV(4));
+      }
+      break;
+    case TOM:
+      if(key){
+        //ON
+        nowRythm |= _BV(3);
+      } else {
+        //OFF
+        nowRythm &= ~(_BV(3));
+      }
+      break;
+    case TCY:
+      if(key){
+        //ON
+        nowRythm |= _BV(2);
+      } else {
+        //OFF
+        nowRythm &= ~(_BV(2));
+      }
+      break;
+    case HH:
+      if(key){
+        //ON
+        nowRythm |= _BV(1);
+      } else {
+        //OFF
+        nowRythm &= ~(_BV(1));
+      }
+      break;
+  }
+  setRegister(chip_FM,0x0E,nowRythm);
+  return;
 }
 
 //@brief  :MIDIから音色を返す
@@ -618,7 +675,25 @@ int retOct(byte data){
   return ((int)data / 12) - 1;
 }
 
-
+rythmSelect retRythm(byte data){
+  switch(data){
+    case 0x24:
+      return BD;
+      break;
+    case 0x26:
+      return SD;
+      break;
+    case 0x2F:
+      return TOM;
+      break;
+    case 0x31:
+      return TCY;
+      break;
+    case 0x2A:
+      return HH;
+      break;
+  }
+}
 
 //-----------------------------------
 
@@ -631,7 +706,7 @@ int retOct(byte data){
 void noteOn(int ch,int note){
   int oct = retOct(note);
   toneSelect tone = retTone(note);
-
+  
   switch(ch){
     case 0:
       //PSG1
@@ -639,72 +714,127 @@ void noteOn(int ch,int note){
         //PSG1.A is available
         status_PSG1.used[0] = true;
         int freq = retFreq(tone,oct);
+        status_PSG1.nowFreq[0] = freq;
         setTonePSG(chip_PSG1,0,freq);
       } else if(!(status_PSG1.used[1])){
         //PSG1.B is available
         status_PSG1.used[1] = true;
         int freq = retFreq(tone,oct);
+        status_PSG1.nowFreq[1] = freq;
         setTonePSG(chip_PSG1,1,freq);
       } else if(!(status_PSG1.used[2])){
         //PSG1.C is available
         status_PSG1.used[2] = true;
         int freq = retFreq(tone,oct);
+        status_PSG1.nowFreq[2] = freq;
         setTonePSG(chip_PSG1,2,freq);      
       } else {
         //Any Tone generator is unavailable
         break;
       }
+      break;
     case 1:
       //PSG2
       if(!(status_PSG2.used[0])){
         //PSG2.A is available
         status_PSG2.used[0] = true;
         int freq = retFreq(tone,oct);
+        status_PSG2.nowFreq[0] = freq;
         setTonePSG(chip_PSG2,0,freq);
       } else if(!(status_PSG2.used[1])){
         //PSG2.B is available
         status_PSG2.used[1] = true;
         int freq = retFreq(tone,oct);
+        status_PSG2.nowFreq[1] = freq;
         setTonePSG(chip_PSG2,1,freq);
       } else if(!(status_PSG2.used[2])){
         //PSG2.C is available
         status_PSG3.used[2] = true;
         int freq = retFreq(tone,oct);
+        status_PSG2.nowFreq[2] = freq;
         setTonePSG(chip_PSG2,2,freq);      
       } else {
         //Any Tone generator is unavailable
         break;
       }
+      break;
     case 2:
       //PSG3
       if(!(status_PSG3.used[0])){
         //PSG3.A is available
         status_PSG3.used[0] = true;
         int freq = retFreq(tone,oct);
+        status_PSG3.nowFreq[0] = freq;
         setTonePSG(chip_PSG3,0,freq);
       } else if(!(status_PSG3.used[1])){
         //PSG3.B is available
         status_PSG3.used[1] = true;
         int freq = retFreq(tone,oct);
+        status_PSG3.nowFreq[1] = freq;
         setTonePSG(chip_PSG3,1,freq);
       } else if(!(status_PSG3.used[2])){
         //PSG3.C is available
         status_PSG3.used[2] = true;
         int freq = retFreq(tone,oct);
+        status_PSG3.nowFreq[0] = freq;
         setTonePSG(chip_PSG3,2,freq);      
       } else {
         //Any Tone generator is unavailable
         break;
       }
+      break;
     case 3:
       //FM1(ch0-2)
-
+      if(!(status_FM1.used[0])){
+        //FM1.A(ch0) is available
+        status_FM1.used[0] = true;
+        int fNumber = retFnum(tone);
+        status_FM1.nowFnum[0] = fNumber;
+        setToneFM(chip_FM,0,fNumber,oct);
+      } else if(!status_FM1.used[1]){
+        //FM1.B(ch1) is available
+        status_FM1.used[1] = true;
+        int fNumber = retFnum(tone);
+        status_FM1.nowFnum[1] = fNumber;
+        setToneFM(chip_FM,1,fNumber,oct);
+      } else if(!status_FM1.used[2]){
+        //FM1.C(ch2) is available
+        status_FM1.used[2] = true;
+        int fNumber = retFnum(tone);
+        status_FM1.nowFnum[2] = fNumber;
+        setToneFM(chip_FM,2,fNumber,oct);
+      } else {
+        //Any Tone Generator is unavailable
+      }
+      break;
     case 4:
       //FM2(ch3-5)
-
+      if(!(status_FM2.used[0])){
+        //FM2.A(ch3) is available
+        status_FM2.used[0] = true;
+        int fNumber = retFnum(tone);
+        status_FM2.nowFnum[0] = fNumber;
+        setToneFM(chip_FM,3,fNumber,oct);
+      } else if(!status_FM2.used[1]){
+        //FM2.B(ch4) is available
+        status_FM2.used[1] = true;
+        int fNumber = retFnum(tone);
+        status_FM2.nowFnum[1] = fNumber;
+        setToneFM(chip_FM,4,fNumber,oct);
+      } else if(!status_FM2.used[2]){
+        //FM2.C(ch5) is available
+        status_FM2.used[2] = true;
+        int fNumber = retFnum(tone);
+        status_FM2.nowFnum[2] = fNumber;
+        setToneFM(chip_FM,5,fNumber,oct);
+      } else {
+        //Any Tone Generator is unavailable
+      }
+      break;
     case 9:
       //FM_Rythm
-
+      rythmSelect rythm = retRythm(note);
+      setFMRythm(rythm,true);
     default:
       break;
   }
@@ -783,6 +913,7 @@ void parseMIDI(){
 void setup() {
   init();
   resetAll();
+  setRegister(chip_FM,0x0E,0x20);
 }
 
 //@brief  :メインループ
