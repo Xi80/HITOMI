@@ -50,7 +50,7 @@ I/F:**MIDI(DIN5Pin),3.5mmステレオジャック(出力はモノラル)**
 | ------------------------------------------------------------ | ---- | ---- |
 | [ＡＶＲマイコンＡＴＭＥＧＡ１２８４Ｐ－ＰＵ](http://akizukidenshi.com/catalog/g/gI-04461/) | 1    | 750  |
 | [ヤマハ音源ＩＣ（ＹＭＺ２９４）](http://akizukidenshi.com/catalog/g/gI-12141/) | 3    | 900  |
-| [YM2413](https://www.chip1stop.com/view/dispDetail/DispDetail?partId=YMHA-0000015&mpn=YM2413) | 1    | 1660 |
+| [YM2413](https://www.chip1stop.com/view/dispDetail/DispDetail?partId=YMHA-0000015&mpn=YM2413) | 1    | 1710 |
 | [２回路入ＨｉＦｉオペアンプ　ＮＪＭ２１１４ＤＤ](http://akizukidenshi.com/catalog/g/gI-00068/) | 1    | 100  |
 | [フォトカプラ　フォトリレー　ＴＬＰ２６３０Ｆ](http://akizukidenshi.com/catalog/g/gI-08254/) | 1    | 150  |
 

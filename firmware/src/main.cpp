@@ -31,11 +31,11 @@
 #define A0_PIN      (PC5)
 
 // Status LEDs
-#define PSG1_LED    (PD3)    
-#define PSG2_LED    (PD4)
-#define PSG3_LED    (PD5)
-#define FMR_LED     (PD6)
-#define FMM_LED     (PD7)
+#define GP_LED1     (PD3)
+#define GP_LED2     (PD4)
+#define GP_LED3     (PD5)
+#define GP_LED4     (PD6)
+#define GP_LED5     (PD7)
 //-----------------------------------
 
 //-----------------------------------
@@ -110,9 +110,6 @@ struct _FM{
   instrumentSelect nowInst  = PIANO;
 };
 
-struct _TONE{
-
-};
 struct _PSG status_PSG1;
 struct _PSG status_PSG2;
 struct _PSG status_PSG3;
@@ -696,6 +693,35 @@ rythmSelect retRythm(byte data){
   }
 }
 
+void debugData(byte data){
+  switch(data){
+    case 0x08:
+      PORTD |= _BV(GP_LED1);
+      _delay_ms(10);
+      PORTD &= ~(_BV(GP_LED1));      
+      break;
+    case 0x09:
+      PORTD |= _BV(GP_LED2);
+      _delay_ms(10);
+      PORTD &= ~(_BV(GP_LED2));      
+      break;
+    case 0x0B:
+      PORTD |= _BV(GP_LED3);
+      _delay_ms(10);
+      PORTD &= ~(_BV(GP_LED3));      
+      break;
+    case 0x0C:
+      PORTD |= _BV(GP_LED4);
+      _delay_ms(10);
+      PORTD &= ~(_BV(GP_LED4));      
+      break;
+    default:
+      PORTD |= _BV(GP_LED5);
+      _delay_ms(10);
+      PORTD &= ~(_BV(GP_LED5));
+      break;
+  }
+}
 //-----------------------------------
 
 
@@ -1059,6 +1085,7 @@ void parseMIDI(){
   data1 = Serial.read();
   top = data1 >> 4;
   bottom = data1 ^ (top << 4);
+  debugData(top);
   switch(top){
     case 0x08:
       //NoteOFF
@@ -1085,7 +1112,6 @@ void parseMIDI(){
       //ProgramChange
       while(!(Serial.available() >= 1));
       data2 = Serial.read();
-      data3 = Serial.read();
       programChange(bottom,data2);
       break;
   }
