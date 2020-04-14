@@ -5,15 +5,16 @@
 #define word unsigned short int
 class ymz294{
 public:
-    ymz294(hc595::hc595 shiftRegister,PinName wrcs,PinName ic,PinName a0);
+    ymz294(hc595 shiftRegister,PinName wrcs,PinName ic,PinName a0);
     void setRegister(byte addr,byte data);
     void reset(void);
     void setFreqency(int ch,word freq);
     void setVolume(int ch,int vol);
+    void sendZero(void);
 private:
     DigitalOut _wrcs;
     DigitalOut _ic;
     DigitalOut _a0;
-    hc595::hc595 _shiftRegister;
+    hc595 _shiftRegister;
 };
 #endif
