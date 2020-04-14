@@ -1,6 +1,7 @@
 #include"ym2413.h"
 
 ym2413::ym2413(hc595 shiftRegister,PinName wrcs,PinName ic,PinName a0): _shiftRegister(shiftRegister), _wrcs(wrcs), _ic(ic), _a0(a0){
+    _wrcs = 1;
 }
 
 //レジスターのセット
@@ -21,9 +22,9 @@ void ym2413::setRegister(byte addr,byte data){
 void ym2413::reset(void){
     _wrcs   = 0;
     _ic     = 0;
-    wait_ms(100);
+    thread_sleep_for(100);
     _ic     =1;
-    wait_ms(1000);
+    thread_sleep_for(1000);
     return;
 }
 

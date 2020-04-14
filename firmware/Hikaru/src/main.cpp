@@ -264,7 +264,7 @@ void resetAll(void){
   PSG1.sendZero();
   PSG2.sendZero();
   FM1.reset();
-  wait_ms(100);
+  thread_sleep_for(100);
   FM3.setRegister(0x16,0x20);
   FM3.setRegister(0x17,0x50);
   FM3.setRegister(0x18,0xC0);

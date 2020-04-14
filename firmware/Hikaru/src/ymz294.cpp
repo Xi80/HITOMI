@@ -1,6 +1,7 @@
 #include <ymz294.h>
 
 ymz294::ymz294(hc595 shiftRegister,PinName wrcs,PinName ic,PinName a0) : _shiftRegister(shiftRegister), _wrcs(wrcs), _ic(ic), _a0(a0){   
+    _wrcs = 1;
 }
 
 //レジスタのセット
@@ -25,7 +26,7 @@ void ymz294::reset(void){
     _wrcs   = 1;
     _a0     = 0;
     _ic     = 0;
-    wait_ms(10);
+    thread_sleep_for(10);
     _ic     = 1;
     return;
 }
