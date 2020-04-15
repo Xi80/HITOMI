@@ -36,8 +36,6 @@ I/F:**USB(UART@9600bps),MIDI(DIN5Pin),3.5mmステレオジャック(出力はモ
 
 ![Board_URA](./images/brd_bottom.png)
 
-![brd](./images/brd_all.png)
-
 ![brd_parts](./images/brd_parts.png)
 
 ## ソフトウェア
