@@ -20,12 +20,12 @@
 //    15/04/2020
 //-------------------------
 
-hc595 shiftRegister(PB_5,PB_4,PB_3,PA_12);
-ymz294 PSG1(shiftRegister,PB_0,PF_1,PA_8);
-ymz294 PSG2(shiftRegister,PB_7,PF_1,PA_8);
-ym2413 FM1(shiftRegister,PB_6,PF_1,PA_8);
-ym2413 FM2(shiftRegister,PB_1,PF_1,PA_8);
-ym2413 FM3(shiftRegister,PF_0,PF_1,PA_8);
+hc595 shiftRegister(PB_5,PB_4,PB_3,PA_11);
+ymz294 PSG1(shiftRegister,PA_12,PA_2,PA_7);
+ymz294 PSG2(shiftRegister,PB_0,PA_2,PA_7);
+ym2413 FM1(shiftRegister,PB_7,PA_2,PA_7);
+ym2413 FM2(shiftRegister,PB_6,PA_2,PA_7);
+ym2413 FM3(shiftRegister,PF_1,PA_2,PA_7);
 Serial midi(PA_9,PA_10,31250);
 Serial pc(USBTX,USBRX,9600);
 //-------------------------
