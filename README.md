@@ -30,13 +30,25 @@ I/F:**USB(UART@9600bps),MIDI(DIN5Pin),3.5mmステレオジャック(出力はモ
 
 回路図を以下に示す。
 
-![Media](./images/sch.png)
+### Main Board(HiT0M1-32)
 
-![Board_OMOTE](./images/brd_top.png)
+![main_sch](images/main_sch.png)
 
-![Board_URA](./images/brd_bottom.png)
+![main_brd_parts](images/main_brd_parts.png)
 
-![brd_parts](./images/brd_parts.png)
+![main_brd_top](images/main_brd_top.png)
+
+![main_brd_bottom](images/main_brd_bottom.png)
+
+### Sub Board(Hikaru)
+
+![sub_sch](images/sub_sch.png)
+
+![sub_brd_parts](images/sub_brd_parts.png)
+
+![sub_brd_top](images/sub_brd_top.png)
+
+![sub_brd_bottom](images/sub_brd_bottom.png)
 
 ## ソフトウェア
 
