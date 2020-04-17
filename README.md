@@ -4,7 +4,7 @@ Hardware MIDI Tone Generator Machine - 32
 
 ![LOGO](./images/LOGO.png)
 
-***THIS PROJECT IS W.I.P!!!!***
+***THIS PROJECT HAS BEEN DISCONTINUED!***
 
 ## 仕様
 
